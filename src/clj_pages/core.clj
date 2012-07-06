@@ -5,6 +5,30 @@
 
 ;; TODO recognize all defhtml in a ns and compile all of them
 
+(defn path->filename
+  "Returns the filename of an absolute path.
+   ex. \"one/two/example.html\" => \"example.html\""
+  [abs-path]
+  (last (clojure.string/split abs-path #"/")))
+
+(defn underscores->spaces [name]
+  (clojure.string/replace name "_" " "))
+
+(defn parse-path
+  "Accepts an absolute path of the form: one/two/example_filename.md
+   Returns a map:
+     { :path \"one/two/example_filename.md\"
+       :filename \"example_filename.md\"
+       :name \"example filename\"
+       :ext \".md\" }"
+  [abs-path]
+  (let [filename (path->filename abs-path)
+        [filename name ext] (re-find #"(.+?)(\.[^.]*$|$)" filename)]
+    {:path abs-path
+     :filename filename
+     :name (underscores->spaces name)
+     :ext ext}))
+
 (defn post-name
   "returns a posts name; foo.md => foo"
   [f]
@@ -24,13 +48,16 @@
   [name page]
   (spit (str "blog/" name ".html") (page)))
 
-(defn compile-all
+#_(defn compile-all
   "compiles all, add pages to compile them"
   []
   (compile-page "index" index)
   (compile-posts))
 
-(defn -main
+(defn render-site []
+  )
+
+#_(defn -main
   "compiles all posts when doing lein run"
   [& args]
   (println "Compiling all...")
@@ -38,7 +65,7 @@
   (println "Done!"))
 
 ;;(defhtml post-item [link title]
-;;         (link-to link title)) 
+;;         (link-to link title))
 
 ;;(map (link-to
 
@@ -46,4 +73,4 @@
   (let [posts (.listFiles (file "_posts/"))]
     (doseq [post posts]
       (map (str "blog/posts/" (post-name post) ".html") (post-name post)))))
- 
+

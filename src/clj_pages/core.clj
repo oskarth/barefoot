@@ -1,9 +1,10 @@
 (ns clj-pages.core
   (:use clj-markdown.core
         clojure.java.io
-        clj-pages.views))
+        [clj-pages.views :only [index]]))
 
 ;; TODO recognize all defhtml in a ns and compile all of them
+;; TODO create output directories if they don't exist
 
 (defn path->filename
   "Returns the filename of an absolute path.
@@ -17,17 +18,33 @@
 (defn parse-path
   "Accepts an absolute path of the form: one/two/example_filename.md
    Returns a map:
-     { :path \"one/two/example_filename.md\"
+     { :path \"_one/example_filename.md\"
+       :target \"out/one/example_filename.html\"
        :filename \"example_filename.md\"
-       :name \"example filename\"
+       :name \"example_filename\"
        :ext \".md\" }"
   [abs-path]
   (let [filename (path->filename abs-path)
         [filename name ext] (re-find #"(.+?)(\.[^.]*$|$)" filename)]
     {:path abs-path
+     :href (str "posts/" name ".html")
      :filename filename
-     :name (underscores->spaces name)
+     :name name
      :ext ext}))
+
+(defn starts-with? [string substring]
+  (= (subs string 0 (count substring)) substring))
+
+(def root-dir (.listFiles (java.io.File. ".")))
+(def out-dir "out")
+(def clusters (filter #(starts-with? (.getName %) "_") root-dir))
+(def posts (first clusters))
+
+(defn get-posts []
+  (map (fn [post]
+         (let [post (parse-path (.getPath post))]
+           (assoc post :html (md->html (slurp (:path post))))))
+       (.listFiles posts)))
 
 (defn post-name
   "returns a posts name; foo.md => foo"
@@ -40,24 +57,21 @@
   []
   (let [posts (.listFiles (file "_posts/"))]
     (doseq [post posts]
-      (spit (str "blog/posts/" (post-name post) ".html")
+      (spit (str out-dir "/posts/" (post-name post) ".html")
             (md->html (slurp post))))))
 
 (defn compile-page
   "compiles page from hiccup to html"
   [name page]
-  (spit (str "blog/" name ".html") (page)))
+  (spit (str out-dir "/" name ".html") (page (get-posts))))
 
-#_(defn compile-all
+(defn compile-all
   "compiles all, add pages to compile them"
   []
   (compile-page "index" index)
   (compile-posts))
 
-(defn render-site []
-  )
-
-#_(defn -main
+(defn -main
   "compiles all posts when doing lein run"
   [& args]
   (println "Compiling all...")

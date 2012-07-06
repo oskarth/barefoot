@@ -3,9 +3,18 @@
         hiccup.def))
 
 (defhtml header []
-         [:h1 "this is my header"])
+  [:h1 "this is my header"])
 
-(defhtml index []
-         (header)
-         [:h2 "Yes it is"]
-         [:h3 "Really!"])
+(defhtml post-item [post]
+  [:li [:a {:href (:href post)} (:name post)]])
+
+(defhtml posts-list [posts]
+  [:ul
+   (map post-item posts)])
+
+(defhtml index [posts]
+  (header)
+  (posts-list posts)
+  [:h2 "Yes it is"]
+  [:h3 "Really!"])
+

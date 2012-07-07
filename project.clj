@@ -4,4 +4,4 @@
             :dependencies [[org.clojure/clojure "1.4.0"]
                            [clj-markdown "0.1.0"]
                            [hiccup "1.0.0"]]
-            :main clj-pages.core)
+            :main clj-pages.render)

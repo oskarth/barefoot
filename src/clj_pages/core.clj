@@ -65,18 +65,11 @@
   [name page]
   (spit (str out-dir "/" name ".html") (page (get-posts))))
 
-(defn compile-all
+(defn render-all
   "compiles all, add pages to compile them"
   []
   (compile-page "index" index)
   (compile-posts))
-
-(defn -main
-  "compiles all posts when doing lein run"
-  [& args]
-  (println "Compiling all...")
-  (compile-all)
-  (println "Done!"))
 
 ;;(defhtml post-item [link title]
 ;;         (link-to link title))

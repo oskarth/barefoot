@@ -73,8 +73,8 @@
   (let [n (.getName f)]
     (nth (re-find #"(.+?)(\.[^.]*$|$)" n) 1)))
 
-(defn parse-args [args]
-  (zipmap [:route :args-list :body] args))
+(defn parse-args [[route args-list & body]]
+  {:route route :args-list args-list :body body})
 
 (def pages (atom {}))
 
@@ -82,6 +82,6 @@
   "associates a route with a function that generates html"
   [& args]
   (let [{:keys [route args-list body]} (parse-args args)]
-    `(swap! pages assoc ~route (defhtml ~(gensym) ~args-list ~body))))
+    `(swap! pages assoc ~route (defhtml ~(gensym) ~args-list ~@body))))
 
 (def get-cluster (partial get clusters))

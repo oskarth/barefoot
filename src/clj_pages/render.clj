@@ -15,16 +15,17 @@
   "outputs html into the given route (directory)"
   [route html-fn]
   (let [path (str out-dir "/" (namespace route) "/" (name route) ".html")]
-    (println path)
     (make-parents path)
     (spit path (html-fn))))
 
 ;; => out/
 
+(defn with-route [item route]
+  (keyword (str (name route) "/" (:name item))))
+
 (defn render-cluster [route html-fn]
   (doseq [item (get-cluster route)]
-    (let [route (keyword (str (name route) "/" (:name item)))]
-      (render route #(html-fn item)))))
+    (render (with-route item route) #(html-fn item))))
 
 (defn render-all
   "compiles all, add pages to compile them"

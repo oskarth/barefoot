@@ -1,4 +1,4 @@
-# clj-pages
+# barefoot
 
 Static page generator using markdown for posts and hiccup for templates.
 

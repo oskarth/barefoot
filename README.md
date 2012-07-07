@@ -36,6 +36,8 @@ Jekyll (inspiration): https://github.com/mojombo/jekyll/wiki
 10. sane defaults in general (about index list two categories drafts)
 11. custom routes rendering dirs
 12. yaml password protection static impossible## License
+13. abstract out io functionality, potentially into two functions spit and slurp that know about our cluster namespacing
+14. thirteen is unlucky
 
 Copyright © 2012 oskarth and zachallaun
 

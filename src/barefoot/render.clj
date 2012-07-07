@@ -3,22 +3,12 @@
         [bultitude.core :only [namespaces-on-classpath]]
         [clojure.java.io :only [file make-parents]]))
 
-#_(defn compile-posts
-  "compiles all .md files in _posts directory into html files"
-  []
-  (let [posts (.listFiles (file "_posts/"))]
-    (doseq [post posts]
-      (spit (str out-dir "/posts/" (post-name post) ".html")
-            (md->html (slurp post))))))
-
 (defn render
   "outputs html into the given route (directory)"
   [route html-fn]
   (let [path (str out-dir "/" (namespace route) "/" (name route) ".html")]
     (make-parents path)
     (spit path (html-fn))))
-
-;; => out/
 
 (defn with-route [item route]
   (keyword (str (name route) "/" (:name item))))

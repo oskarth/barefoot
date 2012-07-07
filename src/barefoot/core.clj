@@ -3,14 +3,6 @@
         clojure.java.io
         [hiccup.def :only [defhtml]]))
 
-;; TODO recognize all defhtml in a ns and compile all of them
-;; TODO create output directories if they don't exist
-;; TODO add clj-yaml support in posts a la jekyll
-
-
-;; http://dev.clojure.org/display/community/Google+Summer+of+Code+2012#GoogleSummerofCode2012-Noirstaticsitegenerator
-;; jekyll
-
 (defn path->filename
   "Returns the filename of an absolute path.
    ex. \"one/two/example.html\" => \"example.html\""
@@ -36,8 +28,6 @@
      :filename filename
      :name name
      :ext ext}))
-
-;; utils
 
 (defn starts-with? [string substring]
   (= (subs string 0 (count substring)) substring))

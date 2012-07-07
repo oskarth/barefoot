@@ -13,11 +13,9 @@
   [:ul
    (map post-item posts)])
 
-(defhtml index [posts]
+(defpage :posts [post]
   (header)
-  (posts-list posts)
-  [:h2 "Yes it is"]
-  [:h3 "Really!"])
+  (:html post))
 
 (defpage :index []
   (posts-list (get-cluster :posts))

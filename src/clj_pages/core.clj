@@ -82,7 +82,6 @@
   "associates a route with a function that generates html"
   [& args]
   (let [{:keys [route args-list body]} (parse-args args)]
-    (println "q " route)
     `(swap! pages assoc ~route (defhtml ~(gensym) ~args-list ~body))))
 
 (def get-cluster (partial get clusters))

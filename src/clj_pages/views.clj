@@ -1,6 +1,7 @@
 (ns clj-pages.views
   (:use hiccup.core
-        hiccup.def))
+        hiccup.def
+        clj-pages.core))
 
 (defhtml header []
   [:h1 "this is my header"])
@@ -18,3 +19,7 @@
   [:h2 "Yes it is"]
   [:h3 "Really!"])
 
+(defpage :index []
+  (posts-list (get-cluster :posts))
+  [:h1 "x"]
+  (header))

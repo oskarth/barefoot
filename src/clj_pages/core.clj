@@ -1,7 +1,7 @@
 (ns clj-pages.core
   (:use clj-markdown.core
         clojure.java.io
-        [clj-pages.views :only [index]]))
+        [hiccup.def :only [defhtml]]))
 
 ;; TODO recognize all defhtml in a ns and compile all of them
 ;; TODO create output directories if they don't exist
@@ -37,19 +37,35 @@
      :name name
      :ext ext}))
 
+;; utils
+
 (defn starts-with? [string substring]
   (= (subs string 0 (count substring)) substring))
 
+(defn dir->kw [dir]
+  (-> dir .getName (subs 1) keyword))
+
 (def root-dir (.listFiles (java.io.File. ".")))
 (def out-dir "out")
-(def clusters (filter #(starts-with? (.getName %) "_") root-dir))
-(def posts (first clusters))
+(def cluster-dirs (filter #(starts-with? (.getName %) "_") root-dir))
+(def cluster-kws (map dir->kw cluster-dirs))
 
-(defn get-posts []
-  (map (fn [post]
-         (let [post (parse-path (.getPath post))]
-           (assoc post :html (md->html (slurp (:path post))))))
-       (.listFiles posts)))
+(defn cluster?
+  "returns true of k is a cluster key"
+  [k]
+  (some #{k} cluster-kws))
+
+(defn get-cluster-items [cluster]
+  (map (fn [item]
+         (let [item (parse-path (.getPath item))]
+           (assoc item :html (md->html (slurp (:path item))))))
+       (.listFiles cluster)))
+
+(def clusters
+  (reduce
+   (fn [coll dir] (assoc coll (dir->kw dir) (get-cluster-items dir)))
+   {}
+   cluster-dirs))
 
 (defn post-name
   "returns a posts name; foo.md => foo"
@@ -57,32 +73,16 @@
   (let [n (.getName f)]
     (nth (re-find #"(.+?)(\.[^.]*$|$)" n) 1)))
 
-(defn compile-posts
-  "compiles all .md files in _posts directory into html files"
-  []
-  (let [posts (.listFiles (file "_posts/"))]
-    (doseq [post posts]
-      (spit (str out-dir "/posts/" (post-name post) ".html")
-            (md->html (slurp post))))))
+(defn parse-args [args]
+  (zipmap [:route :args-list :body] args))
 
-(defn compile-page
-  "compiles page from hiccup to html"
-  [name page]
-  (spit (str out-dir "/" name ".html") (page (get-posts))))
+(def pages (atom {}))
 
-(defn render-all
-  "compiles all, add pages to compile them"
-  []
-  (compile-page "index" index)
-  (compile-posts))
+(defmacro defpage
+  "associates a route with a function that generates html"
+  [& args]
+  (let [{:keys [route args-list body]} (parse-args args)]
+    (println "q " route)
+    `(swap! pages assoc ~route (defhtml ~(gensym) ~args-list ~body))))
 
-;;(defhtml post-item [link title]
-;;         (link-to link title))
-
-;;(map (link-to
-
-#_(defn get-
-  (let [posts (.listFiles (file "_posts/"))]
-    (doseq [post posts]
-      (map (str "blog/posts/" (post-name post) ".html") (post-name post)))))
-
+(def get-cluster (partial get clusters))
